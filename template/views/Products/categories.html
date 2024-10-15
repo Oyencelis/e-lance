@@ -1,0 +1,210 @@
+{% extends 'dashboard-base.html' %}
+
+{% block title %}Product Categories {% endblock %}
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Basic Layout -->
+    {% if auth_user['role_id'] == 3 %}
+    <div class="row">
+      <div class="col-xl">
+        <div class="card mb-6">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Category Management</h5>
+            <!-- <small class="text-body float-end">admin</small> -->
+          </div>
+          <div class="card-body">
+            <form id="add-category">
+              <h4 class="h4 mb-3">Add Category</h2>
+              <div class="mb-6">
+                <label class="form-label" for="basic-default-fullname">Category Name</label>
+                <input type="text" class="form-control" id="catname" name="catname" placeholder="Enter category name" />
+              </div>
+
+              <button type="submit" class="btn btn-primary mb-3"><i class='bx bx-plus-circle'></i>Add Category</button>
+              
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      
+    </div>
+    {% endif %}
+    <div class="card">
+      <h5 class="card-header">Categories</h5>
+      <div class="table-responsive text-nowrap p-5">
+        <table class="table table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Category Name</th>
+              <th>Users</th>
+              {% if auth_user['role_id'] == 1 %}
+                <th>Status</th>
+              {% endif %}
+              <th data-order="created_at">Date Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0 ">
+            {% for data in cat_data %}
+            <tr>
+              <td> <span class="fw-bold">{{ data['category_name'] }}</span></td>
+              <td><span class="text-capitalize">{{ data['firstname'] }} {{ data['lastname'] }}</span></td>
+              {% if auth_user['role_id'] == 1 %}
+                <td>
+                  {% if data['status'] == 2 %}
+                    <span class="badge bg-label-danger me-1">Deleted</span>
+                  {% else %}
+                    <span class="badge bg-label-success me-1">Active</span>
+                  {% endif %}
+                </td>
+              {% endif %}
+              <td><span class=" createdAt">{{ data['created_at'] }}</span></td>
+              <td>
+                <div class="dropdown">
+                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                    <i class="bx bx-dots-vertical-rounded"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item edit-cat" 
+                    data-id="{{ data['category_id'] }}" 
+                    data-category-name="{{ data['category_name'] }}" 
+                    onclick="openEditModal(this)">
+                      <i class="bx bx-edit me-1"></i>Edit
+                    </a>
+                    {% if data['status'] == 1 %}
+                    <a class="dropdown-item change-status" data-status-to="2" data-id="{{ data['category_id'] }}" href="javascript:void(0);">
+                      <i class="bx bx-trash me-1"></i> Delete
+                    </a>
+                    {% else %}
+                    <a class="dropdown-item change-status" data-status-to="1" data-id="{{ data['category_id'] }}" href="javascript:void(0);">
+                      <i class="bx bx-folder-plus me-1"></i> Retrive
+                    </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+            
+          </tbody>
+          
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Update Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-category">
+                    <div class="mb-6">
+                        <label class="form-label" for="catname">Category Name</label>
+                        <input type="text" class="form-control" id="update_cat_name" name="catname" placeholder="Enter category name" required />
+                    </div>
+                    <input type="hidden" id="update_category_id" name="category_id">
+                    <button type="submit" class="btn btn-primary mb-3"><i class='bx bx-plus-circle'></i> Save Changes</button>
+                </form>
+                <p id="edit-error-message" class="text-danger d-none"></p> <!-- For displaying error messages -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+
+  function openEditModal(element){
+     // Get data from the clicked element
+    var categoryId = $(element).attr("data-id");
+    var categoryName = $(element).attr("data-category-name");
+
+    // Set the values in the modal
+    $('#update_cat_name').val(categoryName);
+    $('#update_category_id').val(categoryId);
+
+    $('#editModal').modal('show'); 
+  }
+
+  $(document).ready(function(){
+    
+    
+
+    $("#add-category").submit(function(e){
+      e.preventDefault();
+      
+      var data = new FormData(this);
+      let url = '/add-category';
+
+      $.SystemScript.executePost(url, data).done((response) => {
+        console.log(response.data);
+        if (response.data.status == 'success') {
+          $.SystemScript.swalAlertMessage('Successfully', `${response.data.message}`, 'success');
+          $('.swal2-confirm').click(function(){ 
+              location.reload();
+          });
+        } else {
+          $.SystemScript.swalAlertMessage('Oops!', `${response.data.message}`, 'error');
+        }
+
+      });
+    });
+
+    $("#update-category").submit(function(e){
+      e.preventDefault();
+      
+      var data = new FormData(this);
+      let url = '/update-category';
+      $.SystemScript.executePost(url, data).done((response) => {
+        console.log(response.data);
+        if (response.data.status == 'success') {
+          $.SystemScript.swalAlertMessage('Successfully', `${response.data.message}`, 'success');
+          $('.swal2-confirm').click(function(){ 
+              location.reload();
+          });
+        } else {
+          $.SystemScript.swalAlertMessage('Oops!', `${response.data.message}`, 'error');
+        }
+
+      });
+    });
+
+    $(".change-status").click(function(e) {
+      var user_id = $(this).attr("data-id");
+      var status_to = $(this).attr("data-status-to");
+      var message = status_to == "2" ? 
+                  'Do you want to delete this category?' : 'Do you want to retrieve this category?'
+        $.SystemScript.swalConfirmMessage('Are you sure', 
+          message, 'question').done(function(response) {
+            if(response) {
+                let url = `/change-category-status?cat_id=${user_id}&status_to=${status_to}`;
+                
+                $.SystemScript.executeGet(url).done((response) => {
+                    console.log(response.data);
+                    if (response.data.status == 'success') {
+                        $.SystemScript.swalAlertMessage('Successfully', `${response.data.message}`, 'success');
+                        $('.swal2-confirm').click(function(){
+                            location.reload();
+                        });
+                    } else {
+                        $.SystemScript.swalAlertMessage('Error', `${response.data.message}`, 'error');
+                    }
+                });
+            }
+        });
+    });
+    
+  })
+  
+  
+
+</script>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Login {% endblock %}
+
+{% block content %}
+<section class="py-5">
+	<div class="container-fluid">
+
+	  <div class="bg-secondary py-5 my-5 rounded-5" style="background: url('images/bg-leaves-img-pattern.png') no-repeat;">
+		<div class="container my-5">
+		  <div class="row">
+			<div class="col-md-6 p-5">
+			  <div class="section-header">
+				<h2 class="section-title display-4">Log<span class="text-primary">in</span></h2>
+			  </div>
+			  <p>Welcome to E - Lance's Secure Login Portal. Easily access your account to manage orders, track purchases, and explore the latest products. We prioritize your privacy and secure shopping experience.</p>
+			</div>
+			<div class="col-md-6 p-5">
+			  <form  id="loginForm">
+                  <div class="mb-3">
+                      <label for="" class="form-label">Email</label>
+                      <input type="email" class="form-control form-control-lg" name="email" id="email" placeholder="Enter your email">
+                    </div>
+                    <div class="mb-3">
+                      <label for="name" class="form-label">Password</label>
+                      <input type="password"
+                        class="form-control form-control-lg" name="password" id="password" placeholder="Enter password">
+                    </div>
+				<!-- <div class="form-check form-check-inline mb-3">
+				  <label class="form-check-label" for="subscribe">
+				  <input class="form-check-input" type="checkbox" id="subscribe" value="subscribe">
+				  Remember Login?</label>
+				</div> -->
+				<div class="d-grid gap-2">
+				  <button type="submit" class="btn btn-dark btn-lg">Login</button>
+				</div>
+				<p>Don't Have an Account?<a href="/signup">Sign up</a></p>
+			  </form>
+			  
+			</div>
+			
+		  </div>
+		  
+		</div>
+	  </div>
+	  
+	</div>
+  </section>
+
+{% endblock %}
+
+
+{% block script %} 
+<script>
+$(document).ready(function() {
+	$("#loginForm").submit(function(e) {
+		e.preventDefault(); // Prevent form from reloading the page
+
+		var data = new FormData(this);
+		let path = `/login`;
+
+		$.SystemScript.executePost(path, data).done((response) => {
+			console.log(response.data);
+			if (response.data.status == 'success') {
+				let role = response.data.data.role_id;
+				if (role == 1 || role == 3){
+					window.location.href = '/dashboard'; 
+				} else {
+					window.location.href = '/'
+				}
+			} else {
+				$.SystemScript.swalAlertMessage('Oops!', `${response.data.message}`, 'error');
+				$("#password").val(''); 
+			}
+		});
+	});
+	
+})
+
+</script>
+
+{% endblock %}
