@@ -1,0 +1,33 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+
+# Logs
+*.log
+
+# Configuration files
+.env
+.env.*
+
+# Database files
+*.db
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints
+
+# IDE specific files
+.idea/
+.vscode/
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
