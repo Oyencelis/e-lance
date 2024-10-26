@@ -1,0 +1,183 @@
+{% extends 'dashboard-base.html' %}
+
+{% block title %}Manage Profile{% endblock %}
+
+{% block content %}
+{% if auth_user['role_id'] == 3 %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Store Information Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="section-title">Store Information</h5>
+                    <form>
+                        <div class="mb-3">
+                            <label for="storeName" class="form-label">Store Name</label>
+                            <input type="text" class="form-control" id="storeName" value="John Doe Store" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tagline" class="form-label">Store Tagline</label>
+                            <input type="text" class="form-control" id="tagline" value="Top quality products for all your needs" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Business Description</label>
+                            <textarea class="form-control" id="description" rows="3" required>Description of your store's mission, values, and products.</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="section-title">Contact Information</h5>
+                    <form>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">primaryer Support Email</label>
+                            <input type="email" class="form-control" id="email" value="support@johndoestore.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">primaryer Support Phone</label>
+                            <input type="tel" class="form-control" id="phone" value="+1 234 567 8900" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Hours & Policies Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="section-title">Business Hours & Policies</h5>
+                    <form>
+                        <div class="mb-3">
+                            <label for="businessHours" class="form-label">Business Hours</label>
+                            <input type="text" class="form-control" id="businessHours" value="Mon - Fri, 9 AM - 6 PM" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="returnPolicy" class="form-label">Return Policy</label>
+                            <textarea class="form-control" id="returnPolicy" rows="3" required>Specify your return and refund policy here.</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Media Links Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="section-title">Social Media Links</h5>
+                    <form>
+                        <div class="mb-3">
+                            <label for="facebook" class="form-label">Facebook</label>
+                            <input type="url" class="form-control" id="facebook" value="https://facebook.com/johndoestore" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="instagram" class="form-label">Instagram</label>
+                            <input type="url" class="form-control" id="instagram" value="https://instagram.com/johndoestore" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+
+<div class="container my-5">
+    
+
+    <div class="row">
+        <!-- Admin Information Section -->
+        <div class="col-lg-6 mb-4">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="section-title">Admin Information</h5>
+                <form>
+                    <div class="mb-3">
+                        <label for="adminName" class="form-label">Admin Name</label>
+                        <input type="text" class="form-control" id="adminName" value="John Doe" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="adminEmail" class="form-label">Admin Email</label>
+                        <input type="email" class="form-control" id="adminEmail" value="admin@example.com" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="adminPhone" class="form-label">Admin Phone</label>
+                        <input type="text" class="form-control" id="adminPhone" value="+1 234 567 8900" >
+                    </div>
+                    <button type="button" class="btn btn-primary">Edit Information</button>
+                </form>
+            </div>
+        </div>
+        </div>
+
+        <!-- Account Security Section -->
+        <div class="col-lg-6 mb-4">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="section-title">Account Security</h5>
+                <form>
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword">
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </form>
+            </div>
+        </div>
+        </div>
+        <!-- Permissions Section -->
+        <div class="col-lg-6 mb-4">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="section-title">Manage Permissions</h5>
+                <form>
+                    <div class="mb-3">
+                        <label for="permissions" class="form-label">Current Permissions</label>
+                        <input type="text" class="form-control" id="permissions" value="Admin" >
+                    </div>
+                    <button type="button" class="btn btn-primary">Edit Permissions</button>
+                </form>
+            </div>
+        </div>
+        </div>
+
+
+        <!-- Additional Settings Section -->
+        <div class="col-lg-6 mb-4">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="section-title">Additional Settings</h5>
+                <p>You can configure various settings to improve your management experience.</p>
+                <button class="btn btn-primary">Configure Settings</button>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

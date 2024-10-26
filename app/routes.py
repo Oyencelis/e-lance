@@ -4,12 +4,16 @@ from flask import Flask, session, redirect, url_for, g
 from middleware.auth import login_required
 #Helpers
 from helpers.Session import sessionRemove
+from helpers.HelperFunction import responseData
+
 # Controllers
 from controller.HomeController import home
 from controller.LoginController import login, LoginSubmit, signup, signupSubmit
 # Authenticate controllers
 from controller.DashboardController import dashboardIndex
 from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts
+from controller.ManageProfileController import sellerRequestSubmit, sellerRequest, manageProfile
+from controller.UserController import seller
 
 
 
@@ -51,13 +55,27 @@ def setup_routes(app: Flask):
         return signupSubmit()
     
 
+    @app.route('/seller-request')
+    @login_required
+    def seller_request():
+        return sellerRequest()
+    
+    @app.route('/seller-request', methods=['POST'])
+    @login_required
+    def seller_request_submit():
+        return sellerRequestSubmit()
+    
+    @app.route('/seller')
+    @login_required
+    def seller_dashboard():
+        return seller()
     
 
     @app.route('/logout')
     @login_required 
     def logout():
         sessionRemove('authenticated') # Clear session data
-        return redirect(url_for('login_page'))
+        return redirect(url_for('home_page'))
 
     @app.route('/dashboard')
     @login_required 
@@ -100,3 +118,9 @@ def setup_routes(app: Flask):
     @login_required
     def update_products():
         return updateProducts()
+    
+    @app.route('/profile')
+    @login_required
+    def manage_profile():
+        return manageProfile()
+    

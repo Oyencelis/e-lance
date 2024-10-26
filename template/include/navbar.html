@@ -246,18 +246,29 @@
                 <li class="nav-item">
                   <a href="#blog" class="nav-link">Cart</a>
                 </li>
-                {% if 'authenticated' in session %} 
-                    <li class="nav-item">
-                        <a href="/dashboard" class="nav-link">Dashboard</a>  
-                    </li>
-                    <li class="nav-item">
+                {% if 'authenticated' in session %}
+                  {% if auth_user['role_id'] == 1 or auth_user['role_id'] == 3 %}
+                      <li class="nav-item">
+                          <a href="/dashboard" class="nav-link">Dashboard</a>  
+                      </li>
+                  {% endif %}
+                  <li class="nav-item">
                       <a href="/logout" class="nav-link">Logout</a>  
                   </li>
+
+                  <!-- Show "Become a Seller" only for buyers -->
+                  {% if auth_user['role_id'] == 2 %}
+                      <li class="nav-item">
+                          <a href="/seller-request" class="nav-link">Become a Seller</a>
+                      </li>
+                  {% endif %}
+                  
                 {% else %}
                     <li class="nav-item">
                         <a href="/login" class="nav-link">Log In</a> 
                     </li>
                 {% endif %}
+
 
               </ul>
             

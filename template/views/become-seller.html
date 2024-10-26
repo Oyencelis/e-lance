@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Become a Seller {% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="bg-secondary py-5 my-5 rounded-5" style="background: url('images/bg-leaves-img-pattern.png') no-repeat;">
+            <div class="container my-5">
+                <div class="row">
+                    <div class="col-md-6 p-5">
+                        <div class="section-header">
+                            <h2 class="section-title display-4">Become a <span class="text-primary">Seller</span></h2>
+                        </div>
+                        <p>
+                            Unlock your entrepreneurial potential by joining E-Lance, the premier platform for connecting buyers with top-quality products! 
+                            As a seller on our platform, you gain access to a vast customer base eager to discover what you have to offer. 
+                            Whether you’re a seasoned entrepreneur or just starting out, E-Lance provides you with the tools and support you need to succeed.
+                        </p>
+                    </div>
+                    <div class="col-md-6 p-5">
+                        <form id="becomeSellerForm"  method="POST">
+                            <div class="md-6">
+                                <label for="storeName" class="form-label">Store Name</label>
+                                <input type="text" class="form-control form-control-lg" id="storeName" name="storeName" placeholder="Enter your store name" >
+                            </div>
+                            <div class="mb-3">
+                                <label for="businessDescription" class="form-label">Business Description</label>
+                                <textarea class="form-control form-control-lg" id="businessDescription" name="businessDescription" rows="3" placeholder="Describe your business"></textarea>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-dark btn-lg">Submit Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block script %} 
+<script>
+$(document).ready(function() {
+	$("#becomeSellerForm").submit(function(e) {
+		e.preventDefault(); 
+		var data = new FormData(this);
+		let path = `/seller-request`;
+
+		$.SystemScript.executePost(path, data).done((response) => {
+			console.log(response.data);
+			if (response.data.status == 'success') {
+                $.SystemScript.swalAlertMessage('Success!', `${response.data.message}`, 'success');
+			} else {
+				$.SystemScript.swalAlertMessage('Oops!', `${response.data.message}`, 'error');
+			}
+		});
+	});
+	
+})
+
+</script>
+
+{% endblock %}

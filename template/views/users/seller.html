@@ -1,0 +1,55 @@
+{% extends 'dashboard-base.html' %}
+
+{% block title %}Manage Profile{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+
+<div class="card">
+    <h5 class="card-header">Seller Management</h5>
+    <div class="table-responsive text-nowrap p-5">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Seller Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th data-order="created_at">Date Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0 ">
+          <tr>
+            <td> <span class="fw-bold"></span>Risu</td>
+            <td><span class="text">oyencelis@gmail.com</span></td>
+              <td>
+                <span class="badge bg-label-warning me-1">Pending</span>
+            
+              </td>
+            <td><span class=" createdAt">2024-03-12</span></td>
+            <td>
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                  <i class="bx bx-dots-vertical-rounded"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item edit-cat" 
+                  >
+                  <i class='bx bx-user-check'></i>Approve
+                  </a>
+                  <a class="dropdown-item change-status" href="javascript:void(0);">
+                    <i class='bx bx-user-x' ></i>Disable
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+        </tbody>
+        
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
