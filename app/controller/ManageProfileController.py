@@ -7,19 +7,20 @@ def manageProfile():
     active_menu = ['manage']
     return render_template('views/manage-profile/manageProfile.html', menu = active_menu)
 
-def sellerRequest():
-    user_id = session.get('user_id')
-    print(f"User ID: {user_id}")  # Debugging
-    query = "SELECT user_id FROM seller_details WHERE user_id = %s"
-    
-    # Execute the query to check if the user already has a seller request
-    result = executeGet(query, (user_id,))
-    
-    # If user already has a seller request, you might want to inform them
-    if result:  # Assuming `result` returns a list of records
-        return render_template('views/become-seller.html', message="You already have a seller request under review.")
+from flask import g, session, render_template
 
-    return render_template('views/become-seller.html')
+def sellerRequest():
+    user_id = g.authenticated['user_id']
+    query = "SELECT user_id FROM seller_details WHERE user_id = %s"
+    result = executeGet(query, (user_id,))
+    if result:
+        sellerRequestSubmit = True
+    else:
+        sellerRequestSubmit = False
+    session['sellerRequestSubmit'] = sellerRequestSubmit
+
+    return render_template('views/become-seller.html', sellerRequestSubmit=sellerRequestSubmit)
+
 
 def sellerRequestSubmit():
     store_name = request.form.get('storeName')

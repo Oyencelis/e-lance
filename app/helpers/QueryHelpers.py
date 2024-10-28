@@ -58,3 +58,14 @@ def changeStatus(table_name, id_field, value_id, status_to):
     except Exception as e:
         print(f"Error: {str(e)}")  # Optionally log the error for debugging
         return responseData("error", "Something went wrong!", "", 200)
+    
+def changeRole(table_name, id_field, value_id, status_to):
+    query = f"UPDATE {table_name} SET role_id = %s WHERE {id_field} = %s"
+    try:
+        result = executePost(query, (status_to, value_id))
+        if result:  # Check if the result indicates success
+            return True
+        return False
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Optionally log the error for debugging
+        return responseData("error", "Something went wrong!", "", 200)

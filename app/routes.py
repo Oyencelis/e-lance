@@ -13,7 +13,7 @@ from controller.LoginController import login, LoginSubmit, signup, signupSubmit
 from controller.DashboardController import dashboardIndex
 from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts
 from controller.ManageProfileController import sellerRequestSubmit, sellerRequest, manageProfile
-from controller.UserController import seller
+from controller.UserController import seller, updateSeller
 
 
 
@@ -123,4 +123,8 @@ def setup_routes(app: Flask):
     @login_required
     def manage_profile():
         return manageProfile()
+    
+    @app.route('/update-seller', methods=['GET', 'POST'])
+    def update_seller():
+        return updateSeller()
     
