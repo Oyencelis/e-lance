@@ -12,9 +12,6 @@
     <symbol xmlns="http://www.w3.org/2000/svg" id="calendar" viewBox="0 0 24 24">
       <path fill="currentColor" d="M19 4h-2V3a1 1 0 0 0-2 0v1H9V3a1 1 0 0 0-2 0v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3Zm1 15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7h16Zm0-9H4V7a1 1 0 0 1 1-1h2v1a1 1 0 0 0 2 0V6h6v1a1 1 0 0 0 2 0V6h2a1 1 0 0 1 1 1Z"/>
     </symbol>
-    <symbol xmlns="http://www.w3.org/2000/svg" id="heart" viewBox="0 0 24 24">
-      <path fill="currentColor" d="M20.16 4.61A6.27 6.27 0 0 0 12 4a6.27 6.27 0 0 0-8.16 9.48l7.45 7.45a1 1 0 0 0 1.42 0l7.45-7.45a6.27 6.27 0 0 0 0-8.87Zm-1.41 7.46L12 18.81l-6.75-6.74a4.28 4.28 0 0 1 3-7.3a4.25 4.25 0 0 1 3 1.25a1 1 0 0 0 1.42 0a4.27 4.27 0 0 1 6 6.05Z"/>
-    </symbol>
     <symbol xmlns="http://www.w3.org/2000/svg" id="plus" viewBox="0 0 24 24">
       <path fill="currentColor" d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2Z"/>
     </symbol>
@@ -128,10 +125,14 @@
         <div class="search-bar row bg-light p-2 my-2 rounded-4">
           <div class="col-md-4 d-none d-md-block">
             <select class="form-select border-0 bg-transparent">
-              <option>All Categories</option>
-              <option>Groceries</option>
-              <option>Drinks</option>
-              <option>Chocolates</option>
+              <option value="">All Categories</option>
+              {% if cat_data %}
+                {% for data in cat_data %}
+                  <option value="{{ data['category_id'] }}">{{ data['category_name'] }}</option>
+                {% endfor %}
+              {% else %}
+                <option>No categories available</option>
+              {% endif %}
             </select>
           </div>
           <div class="col-11 col-md-7">
@@ -146,10 +147,6 @@
       </div>
       
       <div class="col-sm-8 col-lg-4 d-flex justify-content-end gap-5 align-items-center mt-4 mt-sm-0 justify-content-center justify-content-sm-end">
-        <div class="support-box text-end d-none d-xl-block">
-          <span class="fs-6 text-muted">For Support?</span>
-          <h5 class="mb-0">+980-34984089</h5>
-        </div>
 
         <ul class="d-flex justify-content-end list-unstyled m-0">
           {% if 'user_id' in session %}
@@ -165,11 +162,7 @@
             </a>
           </li>
           {% endif %}
-          <li>
-            <a href="#" class="rounded-circle bg-light p-2 mx-1">
-              <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#heart"></use></svg>
-            </a>
-          </li>
+        
           <li class="d-lg-none">
             <a href="#" class="rounded-circle bg-light p-2 mx-1" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart">
               <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#cart"></use></svg>
@@ -212,10 +205,15 @@
           
               <select class="filter-categories border-0 mb-0 me-5">
                 <option>Browse Products</option>
-                <option>Groceries</option>
-                <option>Drinks</option>
-                <option>Chocolates</option>
-              </select>
+                {% if cat_data %}
+                    {% for data in cat_data[:5] %}  <!-- Limit to the first 5 categories -->
+                        <option value="{{ data['category_id'] }}">{{ data['category_name'] }}</option>
+                    {% endfor %}
+                    <option value="view_all">View All Categories</option>
+                {% else %}
+                    <option>No categories available</option>
+                {% endif %}
+            </select>
               
               <ul class="navbar-nav justify-content-end menu-list list-unstyled d-flex gap-md-3 mb-0">
                 <li class="nav-item active">
@@ -228,20 +226,11 @@
                     <li><a href="/" class="dropdown-item">Latest Offers </a></li>
                   </ul>
                 </li>
-                <li class="nav-item dropdown">
-                  <a href="#men" class="nav-link">Brands</a>
-                </li>
                 <li class="nav-item">
                   <a href="#kids" class="nav-link">Deals</a>
                 </li>
                 <li class="nav-item">
-                  <a href="#accessories" class="nav-link">About Us</a>
-                </li>
-                <li class="nav-item">
-                  <a href="#brand" class="nav-link">Contact Us</a>
-                </li>
-                <li class="nav-item">
-                  <a href="#sale" class="nav-link">Help And Support</a>
+                  <a href="/about" class="nav-link">About Us</a>
                 </li>
                 <li class="nav-item">
                   <a href="#blog" class="nav-link">Cart</a>

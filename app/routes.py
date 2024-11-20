@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import Flask, session, redirect, url_for, g
+from flask import Flask, session, redirect, url_for, g, render_template
 #Middleware
 from middleware.auth import login_required
 #Helpers
@@ -7,13 +7,13 @@ from helpers.Session import sessionRemove
 from helpers.HelperFunction import responseData
 
 # Controllers
-from controller.HomeController import home
+from controller.HomeController import home, loadMoreProducts
 from controller.LoginController import login, LoginSubmit, signup, signupSubmit
 # Authenticate controllers
 from controller.DashboardController import dashboardIndex
 from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts
 from controller.ManageProfileController import sellerRequestSubmit, sellerRequest, manageProfile
-from controller.UserController import seller, updateSeller
+from controller.UserController import seller, updateSeller, buyer, updateBuyer
 
 
 
@@ -29,6 +29,10 @@ def setup_routes(app: Flask):
     @app.route('/')
     def home_page():
         return home() 
+    
+    @app.route('/about')
+    def about_page():
+        return render_template('views/about.html')
     
     #Login Controller
     @app.route('/login')
@@ -69,6 +73,11 @@ def setup_routes(app: Flask):
     @login_required
     def seller_dashboard():
         return seller()
+    
+    @app.route('/buyer')
+    @login_required
+    def buyer_dashboard():
+        return buyer()
     
 
     @app.route('/logout')
@@ -114,7 +123,7 @@ def setup_routes(app: Flask):
     def change_product_status():
         return changeProductStatus()
     
-    @app.route('/')
+    @app.route('/update-product', methods=['POST'])
     @login_required
     def update_products():
         return updateProducts()
@@ -128,3 +137,10 @@ def setup_routes(app: Flask):
     def update_seller():
         return updateSeller()
     
+    @app.route('/update-buyer', methods=['GET', 'POST'])
+    def update_buyer():
+        return updateBuyer()
+    
+    @app.route('/load_more_products', methods=['GET'])
+    def load_more_products():
+        return loadMoreProducts()

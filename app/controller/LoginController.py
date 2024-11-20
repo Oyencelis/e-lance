@@ -19,25 +19,26 @@ def LoginSubmit():
     email = request.form.get('email')
     password = request.form.get('password')
     hashedValue = hashing(password)
-
-    #get selected user for login
     query = "SELECT * FROM users WHERE email = %s AND password = %s"
     user = executeGet(query, (email, hashedValue))
     
     if user:
         user = user[0]
-        user_detail = {
-            'user_id' : user['user_id'],
-            'role_id' : user['role_id'],
-            'firstname' : user['firstname'],
-            'lastname' : user['lastname'],
-        }
-        setSession('authenticated', user_detail)
-        return responseData("success","Login Successfully",user, 200)
+        
+        if user['status'] == 1:
+            user_detail = {
+                'user_id': user['user_id'],
+                'role_id': user['role_id'],
+                'firstname': user['firstname'],
+                'lastname': user['lastname'],
+            }
+            setSession('authenticated', user_detail)
+            return responseData("success", "Login Successfully", user, 200)
+        else:
+            return responseData("error", "Your account is banned. Please contact support.", None, 200)
     else:
+        return responseData("error", "Invalid username or password", None, 200)
 
-        return responseData("error","Invalid username or password",user, 200)
-    
 
 def signup():
     return render_template('views/signup.html')
@@ -71,15 +72,11 @@ def signupSubmit():
     if check_email:
         return responseData("error", "Email already exist", "", 200)
     else:
-        
-        # Hash the password
         hashed_password = hashing(password)
 
-        # Insert user data into the database
         insert_query = "INSERT INTO users (firstname, lastname, email, password, phone) VALUES (%s, %s, %s, %s, %s)"
         executePost(insert_query, (fname, lname, email, hashed_password, phone))
         
-        # Successful signup response
         return responseData("success", "User registered successfully", "", 200)
 
 

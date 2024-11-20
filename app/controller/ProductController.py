@@ -19,7 +19,7 @@ def products():
 
 
 def getProducts(prod):
-    query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, p.description, p.price, p.qty, p.created_at, p.status FROM products p LEFT JOIN categories c ON p.category_id = c.category_id {prod}"
+    query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, p.description, p.price, p.qty, p.created_at, p.status FROM products p LEFT JOIN categories c ON p.category_id = c.category_id  {prod}"
     if prod:
         results = executeGet(query, (g.authenticated.get('user_id'),))
     else:
@@ -126,7 +126,7 @@ def getCategoriesByField(field, condition):
     return results
 
 def getProductsByField(field, condition):
-    query = f"SELECT {field} FROM product {condition}"
+    query = f"SELECT {field} FROM products {condition}"
     results = executeGet(query)
     return results
 
@@ -184,18 +184,30 @@ def updateProducts():
     description =  request.form.get('description')
     price =  request.form.get('price')
     quantity =  request.form.get('quantity')
+    product_id = request.form.get('product_id')
 
     
     if product_name is None or product_name == "":
-        return responseData("error", "Product field is required", "", 200)
+        return responseData("error", "Product name is required", "", 200)
+    
+    if category_id is None or category_id == "":
+        return responseData("error", "Category is required", "", 200)
+    
+    if description is None or description == "":
+        return responseData("error", "Description is required", "", 200)
     
     if price is None or price == "":
-        return responseData("error", "Price field is required", "", 200)
+        return responseData("error", "Price is required", "", 200)
     
     if quantity is None or quantity == "":
-        return responseData("error", "Quantity field is required", "", 200)
+        return responseData("error", "Quantity is required", "", 200)
     
+    products = getProductsByField("product_name", f"WHERE product_name = '{product_name}' AND category_id = {category_id}")
+    if products:
+        return responseData("error", "Product name already exists in this category", "", 200)
     
-
-
-
+    # Perform the update query
+    query = "UPDATE products SET product_name = %s, category_id = %s, description = %s, price = %s, quantity = %s WHERE product_id = %s"
+    executePost(query, (product_name, category_id, description, price, quantity, product_id))
+    
+    return responseData("success", "Product has been updated.", "", 200)

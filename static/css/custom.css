@@ -30,3 +30,72 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
 }
+
+.card-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Container with background-image using object-fit: cover */
+.product-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px; /* Adjust the height as needed */
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+/* Product Image with object-fit: contain */
+.product-image-container img {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-position: center;
+}
+
+.product-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 20px; 
+}
+
+.product-link {
+  display: block;
+  width: 100%;
+  height: 155px; /* Fix the height of the image */
+}
+
+.product-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+h3, .qty, .price {
+  text-align: left;
+  margin: 0.5rem 0;
+}
+
+.input-group {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+
+.product-item img.tab-image {
+  width: 100%;
+  height: 100%; /* Set fixed height for image */
+  object-fit: contain; /* Ensure the image doesn't stretch */
+}
+
+.product-item h3 {
+  font-size: 1rem;
+  margin: 10px 0;
+}

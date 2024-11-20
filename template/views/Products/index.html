@@ -117,7 +117,7 @@
                     <a class="dropdown-item view-product" 
                       data-id="{{ data['product_id'] }}" 
                       data-product-name="{{ data['product_name'] }}" 
-                      onclick="openEditModal(this)">
+                      onclick="openViewModal(this)">
                       <i class="bx bx-show me-1"></i>View
                     </a>
                     {% if data['status'] == 1 %}
@@ -267,6 +267,30 @@
             }
         });
     });
+
+    $("#update-product").submit(function(e){
+      e.preventDefault();
+      
+      var data = new FormData(this);
+      let url = '/update-product';
+      // Get the content from the Quill editor
+      var quillContent = quill2.root.innerHTML;
+      // Append the Quill editor content to the FormData object
+      data.append('description', quillContent);
+      $.SystemScript.executePost(url, data).done((response) => {
+        console.log(response.data);
+        if (response.data.status == 'success') {
+          $.SystemScript.swalAlertMessage('Successfully', `${response.data.message}`, 'success');
+          $('.swal2-confirm').click(function(){ 
+              location.reload();
+          });
+        } else {
+          $.SystemScript.swalAlertMessage('Oops!', `${response.data.message}`, 'error');
+        }
+
+      });
+    });
+
   })
 </script>
 {% endblock %}
