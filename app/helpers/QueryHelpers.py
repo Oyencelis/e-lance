@@ -12,7 +12,7 @@ def executePost(query, params=()):
         last_inserted_id = cursor.lastrowid
         return {"last_inserted_id": last_inserted_id, "rowcount": cursor.rowcount}
     except Error as e:
-        return responseData("success", "An error occurred: {e}", "", 200)
+        return responseData("error", "An error occurred: {e}", "", 200)
         
     finally:
         if conn.is_connected():

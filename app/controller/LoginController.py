@@ -19,6 +19,7 @@ def LoginSubmit():
     email = request.form.get('email')
     password = request.form.get('password')
     hashedValue = hashing(password)
+    print(hashedValue)
     query = "SELECT * FROM users WHERE email = %s AND password = %s"
     user = executeGet(query, (email, hashedValue))
     
@@ -68,7 +69,6 @@ def signupSubmit():
     
     select_query = "SELECT email FROM users WHERE email = %s"
     check_email = executeGet(select_query, (email,))
-    print(email)
     if check_email:
         return responseData("error", "Email already exist", "", 200)
     else:
@@ -76,8 +76,8 @@ def signupSubmit():
 
         insert_query = "INSERT INTO users (firstname, lastname, email, password, phone) VALUES (%s, %s, %s, %s, %s)"
         executePost(insert_query, (fname, lname, email, hashed_password, phone))
-        
         return responseData("success", "User registered successfully", "", 200)
+    
 
 
 def dashboard():

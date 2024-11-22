@@ -62,28 +62,28 @@
       <ul class="list-group mb-3">
         <li class="list-group-item d-flex justify-content-between lh-sm">
           <div>
-            <h6 class="my-0">Growers cider</h6>
-            <small class="text-body-secondary">Brief description</small>
+            <h6 class="my-0">Dried Mangoes</h6>
+            <small class="text-body-secondary">Sweet dried Philippine mangoes</small>
           </div>
-          <span class="text-body-secondary">$12</span>
+          <span class="text-body-secondary">₱250</span>
         </li>
         <li class="list-group-item d-flex justify-content-between lh-sm">
           <div>
-            <h6 class="my-0">Fresh grapes</h6>
-            <small class="text-body-secondary">Brief description</small>
+            <h6 class="my-0">Polvoron</h6>
+            <small class="text-body-secondary">Traditional Filipino shortbread</small>
           </div>
-          <span class="text-body-secondary">$8</span>
+          <span class="text-body-secondary">₱120</span>
         </li>
         <li class="list-group-item d-flex justify-content-between lh-sm">
           <div>
-            <h6 class="my-0">Heinz tomato ketchup</h6>
-            <small class="text-body-secondary">Brief description</small>
+            <h6 class="my-0">Chicharon</h6>
+            <small class="text-body-secondary">Crunchy pork rinds</small>
           </div>
-          <span class="text-body-secondary">$5</span>
+          <span class="text-body-secondary">₱180</span>
         </li>
         <li class="list-group-item d-flex justify-content-between">
-          <span>Total (USD)</span>
-          <strong>$20</strong>
+          <span>Total (PHP)</span>
+          <strong>₱550</strong>
         </li>
       </ul>
 
@@ -116,7 +116,7 @@
       <div class="col-sm-4 col-lg-2 text-center text-sm-start">
         <div class="main-logo">
           <a href="/">
-            <img src="{{ url_for('static', filename='images/e-lance.png') }}" alt="logo" class="img-fluid">
+            <img src="{{ url_for('static', filename='images/e-lance.png') }}" alt="Car Dealership Logo" class="img-fluid">
           </a>
         </div>
       </div>
@@ -125,19 +125,19 @@
         <div class="search-bar row bg-light p-2 my-2 rounded-4">
           <div class="col-md-4 d-none d-md-block">
             <select class="form-select border-0 bg-transparent">
-              <option value="">All Categories</option>
+              <option value="">All Snacks</option>
               {% if cat_data %}
                 {% for data in cat_data %}
                   <option value="{{ data['category_id'] }}">{{ data['category_name'] }}</option>
                 {% endfor %}
               {% else %}
-                <option>No categories available</option>
+                <option>No snacks available</option>
               {% endif %}
             </select>
           </div>
           <div class="col-11 col-md-7">
             <form id="search-form" class="text-center" action="/" method="post">
-              <input type="text" class="form-control border-0 bg-transparent" placeholder="Search for more than 20,000 products" />
+              <input type="text" class="form-control border-0 bg-transparent" placeholder="Search for snacks" />
             </form>
           </div>
           <div class="col-1">
@@ -187,7 +187,7 @@
   </div>
   <div class="container-fluid">
     <div class="row py-3">
-      <div class="d-flex  justify-content-center justify-content-sm-between align-items-center">
+      <div class="d-flex justify-content-center justify-content-sm-between align-items-center">
         <nav class="main-menu d-flex navbar navbar-expand-lg">
 
           <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
@@ -204,36 +204,30 @@
             <div class="offcanvas-body">
           
               <select class="filter-categories border-0 mb-0 me-5">
-                <option>Browse Products</option>
+                <option>Categories</option>
                 {% if cat_data %}
                     {% for data in cat_data[:5] %}  <!-- Limit to the first 5 categories -->
                         <option value="{{ data['category_id'] }}">{{ data['category_name'] }}</option>
                     {% endfor %}
-                    <option value="view_all">View All Categories</option>
+                    <option value="view_all">View All Snacks</option>
                 {% else %}
-                    <option>No categories available</option>
+                    <option>No models available</option>
                 {% endif %}
             </select>
               
               <ul class="navbar-nav justify-content-end menu-list list-unstyled d-flex gap-md-3 mb-0">
                 <li class="nav-item active">
-                  <a href="#women" class="nav-link">Best Seller</a>
+                  <a href="#best-sellers" class="nav-link">Pinoy Favorites</a>
                 </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown" aria-expanded="false">New Arrivals</a>
-                  <ul class="dropdown-menu" aria-labelledby="pages">
-                    <li><a href="/" class="dropdown-item">Recent Products </a></li>
-                    <li><a href="/" class="dropdown-item">Latest Offers </a></li>
-                  </ul>
-                </li>
+                
                 <li class="nav-item">
-                  <a href="#kids" class="nav-link">Deals</a>
+                  <a href="#deals" class="nav-link">Special Bundles</a>
                 </li>
                 <li class="nav-item">
                   <a href="/about" class="nav-link">About Us</a>
                 </li>
                 <li class="nav-item">
-                  <a href="#blog" class="nav-link">Cart</a>
+                  <a href="#cart" class="nav-link">Cart</a>
                 </li>
                 {% if 'authenticated' in session %}
                   {% if auth_user['role_id'] == 1 or auth_user['role_id'] == 3 %}
@@ -248,7 +242,7 @@
                   <!-- Show "Become a Seller" only for buyers -->
                   {% if auth_user['role_id'] == 2 %}
                       <li class="nav-item">
-                          <a href="/seller-request" class="nav-link">Become a Seller</a>
+                          <a href="/seller-request" class="nav-link">Become a Filipino Snacks Seller</a>
                       </li>
                   {% endif %}
                   
@@ -257,7 +251,6 @@
                         <a href="/login" class="nav-link">Log In</a> 
                     </li>
                 {% endif %}
-
 
               </ul>
             

@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
     <!-- Basic Layout -->
-    {% if auth_user['role_id'] == 3 %}
+    {% if auth_user['role_id'] == 1 %}
     <div class="row">
       <div class="col-xl">
         <div class="card mb-6">
@@ -37,7 +37,6 @@
           <thead class="table-dark">
             <tr>
               <th>Category Name</th>
-              <th>Users</th>
               {% if auth_user['role_id'] == 1 %}
                 <th>Status</th>
               {% endif %}
@@ -49,7 +48,6 @@
             {% for data in cat_data %}
             <tr>
               <td> <span class="fw-bold">{{ data['category_name'] }}</span></td>
-              <td><span class="text-capitalize">{{ data['firstname'] }} {{ data['lastname'] }}</span></td>
               {% if auth_user['role_id'] == 1 %}
                 <td>
                   {% if data['status'] == 2 %}

@@ -67,11 +67,13 @@
               <div class="text-truncate" data-i18n="Without menu">Product List</div>
             </a>
           </li>
+          {% if auth_user['role_id'] == 1 %}
           <li class="menu-item {% if 'categories' in menu %} active {% endif%}">
             <a href="/product/categories" class="menu-link">
               <div class="text-truncate" data-i18n="Without menu">Categories</div>
             </a>
           </li>
+          {% endif %}
         </ul>
       </li>
 

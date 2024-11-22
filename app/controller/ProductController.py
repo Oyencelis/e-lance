@@ -9,18 +9,19 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'images', 'uploads')
 
 def products():
     active_menu = ['product', 'products']
+    categories = getCategories("")
     if g.authenticated.get('role_id') == 1:
         products = getProducts("")
-        categories = getCategories("")
+        
     else:
-        products = getProducts("WHERE c.user_id = %s AND p.status = 1")
-        categories = getCategories("WHERE c.user_id = %s AND c.status = 1")
+        products = getProducts("AND p.user_id = %s")
     return render_template('views/products/index.html', menu=active_menu, cat_data=categories, prod_data=products)
 
 
-def getProducts(prod):
-    query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, p.description, p.price, p.qty, p.created_at, p.status FROM products p LEFT JOIN categories c ON p.category_id = c.category_id  {prod}"
-    if prod:
+def getProducts(condition):
+    # query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, p.description, p.price, p.qty, p.created_at, p.status FROM products p LEFT JOIN categories c ON p.category_id = c.category_id  {prod}"
+    query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, p.description, p.price, p.qty, p.created_at, p.status, u.user_id, u.firstname, u.lastname FROM products p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN users u ON p.user_id = u.user_id WHERE p.status = 1 {condition}"
+    if condition:
         results = executeGet(query, (g.authenticated.get('user_id'),))
     else:
         results = executeGet(query)
@@ -36,6 +37,7 @@ def getProducts(prod):
 
 def addProduct():
     product_name = request.form.get('productName')
+    user_id = g.authenticated.get('user_id')
     category_id = request.form.get('category_menu')
     description = request.form.get('description')
     price = request.form.get('price')
@@ -74,8 +76,8 @@ def addProduct():
         
     #Insert product
     
-    insert_query = "INSERT INTO products (category_id, product_name, description, price, qty) VALUES (%s, %s, %s, %s, %s)"
-    result = executePost(insert_query, (category_id, product_name, description, price, quantity))
+    insert_query = "INSERT INTO products (category_id, user_id, product_name, description, price, qty) VALUES (%s, %s, %s, %s, %s, %s)"
+    result = executePost(insert_query, (category_id, user_id, product_name, description, price, quantity))
         
     if "last_inserted_id" in result: 
         # Loop through the image_names array and insert each filename into the database
@@ -94,10 +96,10 @@ def addProduct():
 
 def productCategories():
     active_menu = ['product', 'categories']
-    if g.authenticated.get('role_id') == 1:
-        categories = getCategories("")
-    else:
-        categories = getCategories("WHERE c.user_id = %s AND c.status = 1")
+    # if g.authenticated.get('role_id') == 1:
+    #     categories = getCategories("")
+    # else:
+    categories = getCategories("")
     return render_template('views/products/categories.html', menu=active_menu, cat_data=categories)
 
 def changeProductStatus():
@@ -112,7 +114,8 @@ def changeProductStatus():
 
 
 def getCategories(condition):
-    query = f"SELECT c.user_id, c.category_id, c.category_name, c.created_at, c.updated_at, c.status, u.firstname, u.lastname FROM categories c LEFT JOIN users u ON c.user_id = u.user_id {condition} ORDER BY created_at DESC"
+    # query = f"SELECT c.user_id, c.category_id, c.category_name, c.created_at, c.updated_at, c.status, u.firstname, u.lastname FROM categories c LEFT JOIN users u ON c.user_id = u.user_id {condition} ORDER BY created_at DESC"
+    query = f"SELECT * FROM categories WHERE status = 1"
     if condition:
         results = executeGet(query, (g.authenticated.get('user_id'),))
     else:
@@ -132,20 +135,20 @@ def getProductsByField(field, condition):
 
 
 def addCategories():
-    user_id = g.authenticated.get('user_id')
+    # user_id = g.authenticated.get('user_id')
     category_name = request.form.get('catname')
 
     if category_name is None or category_name == "":
         return responseData("error", "Category field is required", "", 200)
 
     categories = getCategoriesByField("category_name",
-                                      f"WHERE category_name = '{category_name}' AND user_id = {g.authenticated.get('user_id')}")
+                                      f"WHERE category_name = '{category_name}'")
 
     if categories:
         return responseData("error", "Category name is already exist", "", 200)
     else:
-        insert_query = "INSERT INTO categories (user_id, category_name) VALUES (%s, %s)"
-        executePost(insert_query, (user_id, category_name))
+        insert_query = "INSERT INTO categories (category_name) VALUES (%s)"
+        executePost(insert_query, (category_name,))
         return responseData("success", "New category has been added.", "", 200)
 
 
@@ -168,7 +171,7 @@ def updateCategories():
         return responseData("error", "Category field is required", "", 200)
 
     categories = getCategoriesByField("category_name",
-                                      f"WHERE category_name = '{category_name}' AND user_id = {g.authenticated.get('user_id')}")
+                                      f"WHERE category_name = '{category_name}'")
 
     if categories:
         return responseData("error", "Category name is already exist", "", 200)

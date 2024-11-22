@@ -23,9 +23,13 @@ def getProductsInHome(condition="", page=1, per_page=10):
     query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, pa.attachment, p.description, p.price, p.qty, p.created_at, p.status FROM products p LEFT JOIN categories c ON p.category_id = c.category_id left JOIN product_attachments pa ON p.product_id = pa.product_id {condition} GROUP BY p.product_id, p.category_id, p.product_name, c.category_name, p.price, p.qty, p.created_at, p.status LIMIT {offset}, {per_page}"
     results = executeGet(query)
 
+
     for product in results:
         product['formatted_price'] = locale.format_string("%0.2f", product['price'], grouping=True)
-        product['attachment'] = url_for('static', filename='images/uploads/' + product['attachment'])
+        if product['attachment'] is not None:
+            product['attachment'] = url_for('static', filename='images/uploads/' + product['attachment'])
+        else:
+            product['attachment'] = None
     return results
 
 def loadMoreProducts():
