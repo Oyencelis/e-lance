@@ -128,6 +128,8 @@ def setup_routes(app: Flask):
     def update_products():
         return updateProducts()
     
+    
+    
     @app.route('/profile')
     @login_required
     def manage_profile():

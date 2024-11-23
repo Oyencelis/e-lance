@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 22, 2024 at 05:54 AM
+-- Generation Time: Nov 23, 2024 at 06:18 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -237,7 +237,7 @@ INSERT INTO `users` (`user_id`, `role_id`, `firstname`, `lastname`, `email`, `pa
 (11, 1, 'Lawrence', 'Celis', 'admin@gmail.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', '09852074296', '2024-11-21 07:09:16', '2024-11-21 15:16:16', 1),
 (12, 2, 'Inan', 'Celis', 'inan@gmail.com', '7af2f48e5a81fba969f3653a7f987b09258b8573085406cf80741989daa79b61', '09876543211', '2024-11-21 07:20:39', '2024-11-21 18:58:06', 2),
 (13, 3, 'Cedrick', 'Gayoso', 'sedo@gmail.com', '7bd86fd2110cb43d22b2bb9b693b45734b60bf75dcc76d02d49c6f38e73734fe', '09876543212', '2024-11-21 09:11:33', '2024-11-21 17:14:49', 1),
-(14, 3, 'Ruth Jewel', 'Aoay', 'jewel@gmail.com', 'ddc6af1a32422cb2d518f52e8d3cdb5da32c4408e3035946f582fe6e17a89fa7', '09876543213', '2024-11-21 10:57:38', '2024-11-21 20:35:31', 1);
+(14, 2, 'Ruth Jewel', 'Aoay', 'jewel@gmail.com', 'ddc6af1a32422cb2d518f52e8d3cdb5da32c4408e3035946f582fe6e17a89fa7', '09876543213', '2024-11-21 10:57:38', '2024-11-22 19:57:10', 1);
 
 --
 -- Indexes for dumped tables
