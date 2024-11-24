@@ -1,0 +1,138 @@
+{% extends 'base.html' %} {% block title %}{{ product_name }}{% endblock %} {%
+block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-md-6">
+      <img
+        id="mainImage"
+        src="{{ product_image_url }}"
+        alt="{{ product_name }}"
+        class="img-fluid rounded mb-3"
+        style="width: 100%; height: auto; object-fit: contain"
+      />
+
+      <div class="row g-2">
+        {% for image in product_images %}
+        <div class="col-3">
+          <img
+            src="{{ url_for('static', filename='images/uploads/' + image) }}"
+            alt="{{ product_name }}"
+            class="img-fluid rounded thumbnail-img"
+            style="
+              width: 100px;
+              height: 100px;
+              object-fit: cover;
+              cursor: pointer;
+              border: 2px solid transparent;
+            "
+            onclick="changeMainImage(this.src)"
+          />
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <h1 class="mb-4">{{ product_name }}</h1>
+      <h3 class="price mb-4" style="color: var(--accent-color)">
+        Php {{ "{:,.2f}".format(product_price) }}
+      </h3>
+
+      <div class="mb-4">
+        <label for="quantity" class="form-label">Quantity:</label>
+        <div class="input-group" style="width: 150px">
+          <button
+            type="button"
+            class="btn btn-outline-secondary quantity-left-minus"
+            data-type="minus"
+          >
+            -
+          </button>
+          <input
+            type="text"
+            id="quantity"
+            name="quantity"
+            class="form-control input-number text-center"
+            value="1"
+            min="1"
+            max="{{ product_qty }}"
+          />
+          <button
+            type="button"
+            class="btn btn-outline-secondary quantity-right-plus"
+            data-type="plus"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <div class="gap-2 d-flex mb-4">
+        <button class="btn btn-primary flex-grow-1">Add to Cart</button>
+        <button class="btn btn-success flex-grow-1">Buy Now</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-12">
+      <h2 class="mb-3">Product Description</h2>
+      <div class="card">
+        <div class="card-body">
+          <div
+            class="description-content"
+            style="
+              max-height: 100px;
+              overflow: hidden;
+              transition: max-height 0.3s ease-out;
+            "
+          >
+            {{ product_description|safe }}
+          </div>
+          <button class="btn btn-link mt-2" id="view-more-btn">
+            View More
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script>
+  $(document).ready(function () {
+    $(".quantity-left-minus").click(function () {
+      var quantity = parseInt($("#quantity").val());
+      if (quantity > 1) {
+        $("#quantity").val(quantity - 1);
+      }
+    });
+
+    $(".quantity-right-plus").click(function () {
+      var quantity = parseInt($("#quantity").val());
+      $("#quantity").val(quantity + 1);
+    });
+
+    $("#view-more-btn").click(function () {
+      var descriptionContent = $(".description-content");
+      if (descriptionContent.css("max-height") === "100px") {
+        descriptionContent.css("max-height", "none");
+        $(this).text("View Less");
+      } else {
+        descriptionContent.css("max-height", "100px");
+        $(this).text("View More");
+      }
+    });
+
+    // Add thumbnail click functionality
+    $(".thumbnail-img").click(function () {
+      // Remove border from all thumbnails
+      $(".thumbnail-img").css("border", "2px solid transparent");
+      // Add border to clicked thumbnail
+      $(this).css("border", "2px solid var(--accent-color)");
+    });
+  });
+
+  function changeMainImage(src) {
+    $("#mainImage").attr("src", src);
+  }
+</script>
+{% endblock %}

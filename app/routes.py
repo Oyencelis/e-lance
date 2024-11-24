@@ -11,7 +11,7 @@ from controller.HomeController import home, loadMoreProducts
 from controller.LoginController import login, LoginSubmit, signup, signupSubmit
 # Authenticate controllers
 from controller.DashboardController import dashboardIndex
-from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts
+from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts, viewProduct
 from controller.ManageProfileController import sellerRequestSubmit, sellerRequest, manageProfile
 from controller.UserController import seller, updateSeller, buyer, updateBuyer
 
@@ -128,7 +128,9 @@ def setup_routes(app: Flask):
     def update_products():
         return updateProducts()
     
-    
+    @app.route('/product/view/<int:product_id>')
+    def view_product(product_id):
+        return viewProduct(product_id)
     
     @app.route('/profile')
     @login_required
@@ -146,3 +148,7 @@ def setup_routes(app: Flask):
     @app.route('/load_more_products', methods=['GET'])
     def load_more_products():
         return loadMoreProducts()
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('views/404.html'), 404

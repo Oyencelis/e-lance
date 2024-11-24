@@ -108,6 +108,40 @@ def changeProductStatus():
     res = changeStatus("products","product_id", product_id, status_to)
     if res:
         return responseData("success", "Product has been deleted.", product_id, 200)
+    
+def viewProduct(product_id):
+    try:
+        # Sanitize the product_id input
+        product_id = int(product_id)
+        
+        # Get product details using direct SQL query for debugging
+        query = "SELECT p.product_id, p.product_name, p.description, p.price, p.qty, COALESCE (pa.attachment, 'no-image.jpg') as attachment FROM products p LEFT JOIN product_attachments pa ON p.product_id = pa.product_id WHERE p.product_id = %s AND p.status = 1"
+        
+        product = executeGet(query, (product_id,))
+        
+        if not product or len(product) == 0:
+            print(f"No product found with ID: {product_id}")
+            return render_template('views/404.html'), 404
+            
+        product = product[0]  # Get the first result
+        
+        # Prepare image URL
+        image_path = product['attachment']
+        if image_path and image_path != 'no-image.jpg':
+            product_image_url = '/static/images/uploads/' + image_path
+        else:
+            product_image_url = '/static/images/no-image.jpg'
+        
+        return render_template('views/Products/view-products.html',
+                             product_name=product['product_name'],
+                             product_description=product['description'],
+                             product_price=product['price'],
+                             product_image_url=product_image_url,
+                             product_id=product_id)
+                             
+    except Exception as e:
+        print(f"Error in viewProduct: {str(e)}")
+        return render_template('views/404.html'), 404
 
 
 
