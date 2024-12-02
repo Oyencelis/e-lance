@@ -7,11 +7,12 @@ from helpers.Session import sessionRemove
 from helpers.HelperFunction import responseData
 
 # Controllers
-from controller.HomeController import home, loadMoreProducts
+from controller.HomeController import home, loadMoreProducts, categoryPage, getCategoriesInHome
+
 from controller.LoginController import login, LoginSubmit, signup, signupSubmit
 # Authenticate controllers
 from controller.DashboardController import dashboardIndex
-from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts, viewProduct
+from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts, viewProduct, buyProduct
 from controller.ManageProfileController import sellerRequestSubmit, sellerRequest, manageProfile
 from controller.UserController import seller, updateSeller, buyer, updateBuyer
 
@@ -32,7 +33,8 @@ def setup_routes(app: Flask):
     
     @app.route('/about')
     def about_page():
-        return render_template('views/about.html')
+        categories = getCategoriesInHome("WHERE status = 1")
+        return render_template('views/about.html', cat_data=categories,)
     
     #Login Controller
     @app.route('/login')
@@ -148,6 +150,14 @@ def setup_routes(app: Flask):
     @app.route('/load_more_products', methods=['GET'])
     def load_more_products():
         return loadMoreProducts()
+    
+    @app.route('/category/<int:category_id>', methods=['GET', 'POST'])
+    def category_page(category_id):
+        return categoryPage(category_id)
+    
+    @app.route('/buy-product/<int:product_id>', methods=['GET', 'POST'])
+    def buy_product(product_id):
+        return buyProduct(product_id)
 
     @app.errorhandler(404)
     def page_not_found(e):

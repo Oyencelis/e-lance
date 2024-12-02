@@ -1,0 +1,138 @@
+{% extends 'base.html' %} 
+{% block title %}{{ data[0]['category_name'] }} {% endblock %} 
+{% block content%}
+
+<section class="py-5">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="bootstrap-tabs product-tabs">
+            <div
+              class="tabs-header d-flex justify-content-between border-bottom my-5"
+            >
+              <h3>{{ data[0]['category_name'] }}</h3>
+            </div>
+  
+            <div
+              class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5"
+              id="product-grid"
+            >
+              {% for product in data %}
+              <div class="col mb-4">
+                <div class="product-item">
+                  <a
+                    href="/"
+                    title="{{ product['product_name']|truncate(30) }}"
+                    class="product-link"
+                  >
+                    <img
+                      src="{{ product['attachment'] }}"
+                      alt="{{ product['product_name'] }}"
+                      class="tab-image"
+                    />
+                  </a>
+                  <h3>{{ product['product_name']|truncate(30) }}</h3>
+                  <span class="price">Php: {{ product['formatted_price'] }}</span>
+                  <div class="d-flex align-items-center justify-content-center">
+                    <a
+                      href="/product/view/{{ product['product_id'] }}"
+                      class="nav-link btn btn-outline-primary rounded-pill px-4"
+                      style="
+                        transition: all 0.3s ease;
+                        border: 2px solid var(--accent-color);
+                      "
+                      onmouseover="this.style.backgroundColor='var(--accent-color)'; this.style.color='white'"
+                      onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--accent-color)'"
+                      >View Product
+                      <iconify-icon icon="uil:eye" class="ms-1"></iconify-icon
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              {% else %}
+              <p>No products found in this category.</p>
+              {% endfor %}
+            </div>
+  
+            <!-- Load More Button -->
+            <div class="text-center mt-4">
+              <button
+                id="load-more"
+                class="btn btn-custom"
+                data-page="{{ page }}"
+              >
+                Load More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+var loadedProductIds = [];
+var page = 1;
+
+$("#load-more").on("click", function () {
+    page += 1;
+    loadMoreProducts(page);
+});
+
+function loadMoreProducts(page) {
+    var url = "/load_more_products?page=" + page;
+    $.get(url, { loaded_product_ids: loadedProductIds }, function (response) {
+    if (response.status === "success" && response.data.length > 0) {
+        var productGrid = $("#product-grid");
+        $.each(response.data, function (index, product) {
+        if (!loadedProductIds.includes(product.product_id)) {
+            var truncatedProductName = truncateString(
+            product.product_name,
+            30
+            );
+            var productHtml = `
+                        <div class="col mb-4" data-id="${product.product_id}">
+                            <div class="product-item">
+                                <span class="badge bg-success position-absolute m-3">-30%</span>
+                                <a href="/" title="${truncatedProductName}" class="product-link">
+                                    <img src="${product.attachment}" alt="Image" class="tab-image">
+                                </a>
+                                <h3>${truncatedProductName}</h3>
+                                <span class="qty">Quantity: ${product.qty}</span>
+                                <span class="price">Php: ${product.formatted_price}</span>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="input-group product-qty">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus" aria-label="Decrease quantity">
+                                                <svg width="16" height="16"><use xlink:href="#minus"></use></svg>
+                                            </button>
+                                        </span>
+                                        <input type="text" id="quantity" name="quantity" class="form-control input-number" value="1">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus" aria-label="Increase quantity">
+                                                <svg width="16" height="16"><use xlink:href="#plus"></use></svg>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <a href="#" class="nav-link">Add to Cart <iconify-icon icon="uil:shopping-cart"></iconify-icon></a>
+                                </div>
+                            </div>
+                        </div>`;
+            productGrid.append(productHtml);
+            loadedProductIds.push(product.product_id);
+        }
+        });
+    } else {
+        $("#load-more").hide();
+    }
+    });
+}
+function truncateString(str, length) {
+    return str.length > length ? str.substring(0, length) + "..." : str;
+}
+	</script>
+    {% endblock %}

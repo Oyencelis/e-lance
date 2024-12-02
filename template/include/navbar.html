@@ -49,6 +49,8 @@
   <div class="preloader">
   </div>
 </div> -->
+
+{% if auth_user['role_id'] == 2 %}
 <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasCart" aria-labelledby="My Cart">
   <div class="offcanvas-header justify-content-center">
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -62,28 +64,28 @@
       <ul class="list-group mb-3">
         <li class="list-group-item d-flex justify-content-between lh-sm">
           <div>
-            <h6 class="my-0">Dried Mangoes</h6>
-            <small class="text-body-secondary">Sweet dried Philippine mangoes</small>
+            <h6 class="my-0">iPhone 13 Pro</h6>
+            <small class="text-body-secondary">The latest iPhone model</small>
           </div>
-          <span class="text-body-secondary">₱250</span>
+          <span class="text-body-secondary">₱250,000</span>
         </li>
         <li class="list-group-item d-flex justify-content-between lh-sm">
           <div>
-            <h6 class="my-0">Polvoron</h6>
-            <small class="text-body-secondary">Traditional Filipino shortbread</small>
+            <h6 class="my-0">Samsung Galaxy S21</h6>
+            <small class="text-body-secondary">Flagship Android phone</small>
           </div>
-          <span class="text-body-secondary">₱120</span>
+          <span class="text-body-secondary">₱120,000</span>
         </li>
         <li class="list-group-item d-flex justify-content-between lh-sm">
           <div>
-            <h6 class="my-0">Chicharon</h6>
-            <small class="text-body-secondary">Crunchy pork rinds</small>
+            <h6 class="my-0">Google Pixel 6</h6>
+            <small class="text-body-secondary">Pure Android experience</small>
           </div>
-          <span class="text-body-secondary">₱180</span>
+          <span class="text-body-secondary">₱180,000</span>
         </li>
         <li class="list-group-item d-flex justify-content-between">
           <span>Total (PHP)</span>
-          <strong>₱550</strong>
+          <strong>₱550,000</strong>
         </li>
       </ul>
 
@@ -91,6 +93,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasSearch" aria-labelledby="Search">
   <div class="offcanvas-header justify-content-center">
@@ -125,19 +128,19 @@
         <div class="search-bar row bg-light p-2 my-2 rounded-4">
           <div class="col-md-4 d-none d-md-block">
             <select class="form-select border-0 bg-transparent">
-              <option value="">All Snacks</option>
+              <option value="">All smartphones</option>
               {% if cat_data %}
                 {% for data in cat_data %}
                   <option value="{{ data['category_id'] }}">{{ data['category_name'] }}</option>
                 {% endfor %}
               {% else %}
-                <option>No snacks available</option>
+                <option>No smartphones available</option>
               {% endif %}
             </select>
           </div>
           <div class="col-11 col-md-7">
             <form id="search-form" class="text-center" action="/" method="post">
-              <input type="text" class="form-control border-0 bg-transparent" placeholder="Search for snacks" />
+              <input type="text" class="form-control border-0 bg-transparent" placeholder="Search for smartphones" />
             </form>
           </div>
           <div class="col-1">
@@ -149,7 +152,7 @@
       <div class="col-sm-8 col-lg-4 d-flex justify-content-end gap-5 align-items-center mt-4 mt-sm-0 justify-content-center justify-content-sm-end">
 
         <ul class="d-flex justify-content-end list-unstyled m-0">
-          {% if 'user_id' in session %}
+          {% if auth_user %}
           <li>
             <a href="/account" class="rounded-circle bg-light p-2 mx-1">
               <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#user"></use></svg>
@@ -175,6 +178,8 @@
           </li>
         </ul>
 
+        {% if auth_user['role_id'] == 2 %}
+        
         <div class="cart text-end d-none d-lg-block dropdown">
           <button class="border-0 bg-transparent d-flex flex-column gap-2 lh-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart">
             <span class="fs-6 text-muted dropdown-toggle">Your Cart</span>
@@ -182,6 +187,8 @@
           </button>
         </div>
       </div>
+
+      {% endif %}
 
     </div>
   </div>
@@ -202,26 +209,23 @@
             </div>
 
             <div class="offcanvas-body">
-          
-              <select class="filter-categories border-0 mb-0 me-5">
-                <option>Categories</option>
-                {% if cat_data %}
-                    {% for data in cat_data[:5] %}  <!-- Limit to the first 5 categories -->
-                        <option value="{{ data['category_id'] }}">{{ data['category_name'] }}</option>
-                    {% endfor %}
-                    <option value="view_all">View All Snacks</option>
-                {% else %}
-                    <option>No models available</option>
-                {% endif %}
-            </select>
+            
               
               <ul class="navbar-nav justify-content-end menu-list list-unstyled d-flex gap-md-3 mb-0">
-                <li class="nav-item active">
-                  <a href="#best-sellers" class="nav-link">Pinoy Favorites</a>
+                
+                <li class="nav-item dropdown">
+                  <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Categories
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% for data in cat_data %}
+                      <a class="dropdown-item" href="/category/{{ data['category_id'] }}">{{ data['category_name']}}</a>
+                    {% endfor %}
+                  </div>
                 </li>
                 
                 <li class="nav-item">
-                  <a href="#deals" class="nav-link">Special Bundles</a>
+                  <a href="#new-arrivals" class="nav-link">New Arrivals</a>
                 </li>
                 <li class="nav-item">
                   <a href="/about" class="nav-link">About Us</a>
@@ -242,7 +246,7 @@
                   <!-- Show "Become a Seller" only for buyers -->
                   {% if auth_user['role_id'] == 2 %}
                       <li class="nav-item">
-                          <a href="/seller-request" class="nav-link">Become a Filipino Snacks Seller</a>
+                          <a href="/seller-request" class="nav-link">Become a Smartphone Seller</a>
                       </li>
                   {% endif %}
                   

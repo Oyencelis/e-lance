@@ -99,3 +99,32 @@ h3, .qty, .price {
   font-size: 1rem;
   margin: 10px 0;
 }
+
+/* Add this new class for disabled buttons */
+.btn-disabled {
+    cursor: not-allowed; /* Change cursor to indicate it's disabled */
+    opacity: 0.5; /* Optional: make it look visually disabled */
+}
+
+.modal-content {
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.modal-header {
+    background-color: #f8f9fa; /* Light background for header */
+    border-bottom: 1px solid #dee2e6; /* Border for header */
+}
+
+.modal-title {
+    font-weight: bold; /* Bold title */
+}
+
+.modal-body {
+    font-size: 16px; /* Slightly larger font size */
+    color: #333; /* Darker text color */
+}
+
+.modal-footer {
+    justify-content: space-between; /* Space between buttons */
+}

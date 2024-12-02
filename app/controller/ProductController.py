@@ -4,6 +4,7 @@ from helpers.HelperFunction import responseData, allowed_image_file, generate_ra
 import os
 from werkzeug.utils import secure_filename
 import uuid
+from controller.HomeController import getCategoriesInHome
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'images', 'uploads')
 
@@ -20,7 +21,7 @@ def products():
 
 def getProducts(condition):
     # query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, p.description, p.price, p.qty, p.created_at, p.status FROM products p LEFT JOIN categories c ON p.category_id = c.category_id  {prod}"
-    query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, p.description, p.price, p.qty, p.created_at, p.status, u.user_id, u.firstname, u.lastname FROM products p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN users u ON p.user_id = u.user_id WHERE p.status = 1 {condition}"
+    query = f"SELECT p.product_id, p.category_id, p.product_name, c.category_name, p.description, p.price, p.qty, p.created_at, p.status, u.user_id, u.firstname, u.lastname FROM products p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN users u ON p.user_id = u.user_id WHERE p.status = 1 AND c.status != 2 {condition}"
     if condition:
         results = executeGet(query, (g.authenticated.get('user_id'),))
     else:
@@ -110,6 +111,7 @@ def changeProductStatus():
         return responseData("success", "Product has been deleted.", product_id, 200)
     
 def viewProduct(product_id):
+    categories = getCategoriesInHome("WHERE status = 1")
     try:
         # Sanitize the product_id input
         product_id = int(product_id)
@@ -119,7 +121,8 @@ def viewProduct(product_id):
         
         product = executeGet(query, (product_id,))
         
-        if not product or len(product) == 0:
+        # Check if the product list is empty
+        if not product:
             print(f"No product found with ID: {product_id}")
             return render_template('views/404.html'), 404
             
@@ -137,7 +140,9 @@ def viewProduct(product_id):
                              product_description=product['description'],
                              product_price=product['price'],
                              product_image_url=product_image_url,
-                             product_id=product_id)
+                             product_qty=product['qty'],
+                             product_id=product_id,
+                             cat_data=categories)
                              
     except Exception as e:
         print(f"Error in viewProduct: {str(e)}")
@@ -248,3 +253,31 @@ def updateProducts():
     executePost(query, (product_name, category_id, description, price, quantity, product_id))
     
     return responseData("success", "Product has been updated.", "", 200)
+
+def buyProduct(product_id):
+    if request.method == 'POST':
+        # Process the form data
+        full_name = request.form.get('full_name')
+        mobile_number = request.form.get('mobile_number')
+        floor_unit = request.form.get('floor_unit')
+        province = request.form.get('province')
+        district = request.form.get('district')
+        ward = request.form.get('ward')
+        other_notes = request.form.get('other_notes')
+        payment_method = request.form.get('payment_method')
+
+        # Validate the input data
+        if not full_name or not mobile_number or not payment_method:
+            return responseData("error", "Please fill in all required fields.", "", 400)
+
+        # Payment processing logic
+        try:
+            # Call payment gateway API here
+            # e.g., charge the user
+            pass
+        except Exception as e:
+            return responseData("error", "Payment processing failed: " + str(e), "", 400)
+
+        return responseData("success", "Order placed successfully!", "", 200)
+
+    return render_template('views/Products/buy-products.html', product_id=product_id,)
