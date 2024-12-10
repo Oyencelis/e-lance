@@ -7,12 +7,12 @@ from helpers.Session import sessionRemove
 from helpers.HelperFunction import responseData
 
 # Controllers
-from controller.HomeController import home, loadMoreProducts, categoryPage, getCategoriesInHome
+from controller.HomeController import home, loadMoreProducts, categoryPage, getCategoriesInHome, cart, checkout, submitCheckout
 
 from controller.LoginController import login, LoginSubmit, signup, signupSubmit
 # Authenticate controllers
 from controller.DashboardController import dashboardIndex
-from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts, viewProduct, buyProduct
+from controller.ProductController import productCategories, addCategories, changeCategoryStatus, updateCategories, products, addProduct, changeProductStatus, updateProducts, viewProduct, addToCart, removeFromCart, updateCart, details, checkout, detailsSubmit
 from controller.ManageProfileController import sellerRequestSubmit, sellerRequest, manageProfile
 from controller.UserController import seller, updateSeller, buyer, updateBuyer
 
@@ -33,8 +33,9 @@ def setup_routes(app: Flask):
     
     @app.route('/about')
     def about_page():
+        cart_items = session.get('cart', {})
         categories = getCategoriesInHome("WHERE status = 1")
-        return render_template('views/about.html', cat_data=categories,)
+        return render_template('views/about.html', cat_data=categories, cart_items=cart_items)
     
     #Login Controller
     @app.route('/login')
@@ -80,6 +81,11 @@ def setup_routes(app: Flask):
     @login_required
     def buyer_dashboard():
         return buyer()
+    
+    @app.route('/details')
+    @login_required
+    def details_page():
+        return details()
     
 
     @app.route('/logout')
@@ -155,10 +161,35 @@ def setup_routes(app: Flask):
     def category_page(category_id):
         return categoryPage(category_id)
     
-    @app.route('/buy-product/<int:product_id>', methods=['GET', 'POST'])
-    def buy_product(product_id):
-        return buyProduct(product_id)
 
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('views/404.html'), 404
+    
+    @app.route('/cart')
+    def cart_page():
+        return cart()
+    
+    @app.route('/add-to-cart', methods=['POST'])
+    def add_to_cart():
+        return addToCart()
+    
+    @app.route('/remove-from-cart', methods=['POST'])
+    def remove_from_cart():
+        return removeFromCart()
+    
+    @app.route('/update-cart', methods=['POST'])
+    def update_cart():
+        return updateCart()
+    
+    @app.route('/checkout')
+    def checkout_page():
+        return checkout()
+    
+    @app.route('/details-submit', methods=['POST'])
+    def details_submit():
+        return detailsSubmit()
+    
+    @app.route('/submit-checkout',  methods=['POST'])
+    def submit_checkout():
+        return submitCheckout()

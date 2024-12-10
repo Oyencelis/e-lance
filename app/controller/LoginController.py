@@ -1,7 +1,7 @@
-from flask import render_template, request, jsonify, session, redirect
+from flask import render_template, request, jsonify, session, redirect, url_for
 from helpers.HelperFunction import responseData, hashing
 from helpers.QueryHelpers import executeGet, executePost
-from helpers.Session import setSession
+from helpers.Session import setSession, sessionRemove
 # from controller.SessionController import login_user, logout_user, is_logged_in
 
 
@@ -33,6 +33,7 @@ def LoginSubmit():
                 'firstname': user['firstname'],
                 'lastname': user['lastname'],
             }
+
             setSession('authenticated', user_detail)
             return responseData("success", "Login Successfully", user, 200)
         else:
@@ -82,3 +83,6 @@ def signupSubmit():
 
 def dashboard():
     return render_template('views/dashboard.html')
+
+def logout():
+    return redirect(url_for('home_page'))  # Redirect to home or login page

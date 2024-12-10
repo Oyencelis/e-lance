@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Bag{% endblock %}
+{% block content %}
+
+
+<div class="cart-container">
+    {% if cart_items %}
+    <div class="cart-items">
+        {% for item in cart_items %}
+        <div class="cart-item" data-product-id="{{ item.product_id }}">
+            <div class="product-image">
+                <img src="{{ url_for('static', filename='images/uploads/' ~ item.attachment) }}" alt="{{ item.product_name }}">
+            </div>
+            <div class="product-details">
+                <a href="/product/view/{{ item.product_id }}" class="product-name">{{ item.product_name }}</a>
+                <div class="stock-info">Click quantity to edit. Reload for updated price.</div>
+                <div class="quantity-controls">
+                    <input type="text" id="quantity-{{ item.product_id }}" value="{{ item.quantity }}" style="width: 50px; border: none; text-align: center;">
+                </div>
+                <a href="#" class="remove-link" onclick="event.preventDefault(); document.querySelector('form[data-product-id=\'{{ item.product_id }}\']').submit();" style="width: 52px;">Remove</a>
+                <form action="/remove-from-cart" method="POST" style="display: none;" data-product-id="{{ item.product_id }}">
+                    <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                </form>
+            </div>
+            <div class="price">₱{{ item.total_price }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="cart-summary">
+        <div class="total-price">Total: ₱<span id="total-price">{{ total_sum }}</span></div>
+        <button class="checkout-btn btn btn-primary" onclick="openCheckoutModal()" style="background-color: #5ca21a; color: white;">Check Out</button>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal" id="checkoutModal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 class="modal-title">Order Reference: #{{ random_order_reference }}</h2>
+            <h3 class="modal-subtitle">Shipping Fee: Free</h3>
+            
+            <!-- Shipping Fee Section -->
+            <form id="buy-now-form">
+                <div class="payment-methods">
+                    <h3 class="modal-subtitle">Select Payment Method:</h3>
+                    <label class="payment-option">
+                        <input type="radio" name="payment-method" value="gcash" />
+                        <span>GCash</span>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment-method" value="cod" />
+                        <span>Cash on Delivery</span>
+                    </label>
+                </div>
+                <button type="submit" class="buy-now-button">Buy Now</button>
+            </form>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="empty-cart">
+        <p style="font-size: 24px; font-weight: bold;">Your bag is empty.</p>
+        <a href="/" class="btn btn-primary" style="background-color: #5ca21a; color: white;">Continue Shopping</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Function to send the updated quantity to the server
+    function sendQuantityUpdate(productId, quantity) {
+        fetch('/update-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Immediately update the total price displayed
+                const newTotalPrice = data.total_price;
+                const totalPriceElement = document.querySelector('.total-price');
+                
+                if (totalPriceElement) {
+                    totalPriceElement.textContent = `Total: ₱${newTotalPrice}`;
+                }
+
+                // Optionally update the price for the individual item if needed
+                const itemTotalPriceElement = document.querySelector(`#total-price-${productId}`);
+                if (itemTotalPriceElement) {
+                    itemTotalPriceElement.textContent = `₱${data.item_total_price}`;  // Adjust if needed
+                }
+            } else {
+                console.error('Error updating quantity:', data.message);
+            }
+        })
+        .catch(error => console.error('Fetch error:', error));
+    }
+
+    // Update quantity on blur (input field change)
+    document.querySelectorAll('input[id^="quantity-"]').forEach(input => {
+        input.addEventListener('blur', function() {
+            const productId = this.id.split('-')[1]; // Extract product ID from input ID
+            const newQuantity = Math.max(1, parseInt(this.value)); // Ensure valid quantity (at least 1)
+            this.value = newQuantity; // Update the input value to ensure it's a valid number
+            sendQuantityUpdate(productId, newQuantity); // Send the updated quantity to the server
+        });
+    });
+});
+
+    let selectedPaymentMethod = '';
+
+    // Function to open the checkout modal
+    function openCheckoutModal() {
+        document.getElementById('checkoutModal').style.display = 'flex';
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        document.getElementById('checkoutModal').style.display = 'none';
+    }
+
+    // Function to select payment method
+    function selectPaymentMethod(method) {
+        selectedPaymentMethod = method;
+    }
+
+    // Function to handle the buy now action
+    function buyNow() {
+        if (selectedPaymentMethod) {
+            fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    payment_method: selectedPaymentMethod
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    $.SystemScript.swalAlertMessage('Successfully', 'Checkout successful!', 'success');
+                    closeModal(); // Close the modal after successful checkout
+                    // Optionally, redirect or refresh the page
+                } else {
+                    $.SystemScript.swalAlertMessage('Oops!', 'An error occurred during checkout. Please try again.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error during checkout:', error);
+                $.SystemScript.swalAlertMessage('Oops!', 'An error occurred during checkout. Please try again.', 'error');
+            });
+        } else {
+            $.SystemScript.swalAlertMessage('Oops!', 'Please select a payment method before proceeding.', 'error');
+        }
+    }
+
+
+
+    $('#buy-now-form').on('submit', function(e) {
+        e.preventDefault();
+        let totalPrice = $('#total-price').text();
+        console.log(totalPrice);
+        let url = '/submit-checkout';
+        let data = new FormData(this);
+        data.append('total_price', totalPrice);
+        $.SystemScript.executePost(url, data).done((response) => {
+           
+            console.log(response.data);
+            if (response.data.status == 'success') {
+                $.SystemScript.swalAlertMessage('Successfully', `${response.data.message}`, 'success');
+                $('.swal2-confirm').click(function(){ 
+                    location.reload();
+                });
+            } else {
+                $.SystemScript.swalAlertMessage('Oops!', `${response.data.message}`, 'error');
+            }
+
+        });
+    });
+</script>
+{% endblock %}

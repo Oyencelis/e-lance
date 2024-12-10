@@ -49,7 +49,7 @@
 			  >
 				<div class="row banner-content p-5">
 				  <div class="content-wrapper col-md-7">
-					<div class="categories mb-3 pb-3">Flagship Smartphones</div>
+					<div class="categories mb-3 pb-3">Flagship</div>
 					<h3 class="banner-title">Top Smartphones</h3>
 					<a href="/category/29" class="d-flex align-items-center nav-link"
 					  >Shop Collection
@@ -317,31 +317,34 @@
 		  productGrid.empty().append(items);
 		}
 	
-		function shuffleCarousel() {
-		  var carousel = $(".brand-carousel .swiper-wrapper");
-		  var items = carousel.children(".swiper-slide").get();
-	
-		  items.sort(function () {
-			return 0.5 - Math.random();
-		  });
-		  carousel.empty().append(items);
-		}
-	
 		shuffleProducts();
-		shuffleCarousel();
 		$('a[data-bs-toggle="pill"]').on("shown.bs.tab", function () {
 		  shuffleProducts();
 		});
-		shuffleCarousel();
 	
 		var loadedProductIds = [];
 		var page = 1;
 	
+		function shuffleProductCards() {
+		  var productGrid = $("#product-grid");
+		  var items = productGrid.children(".col").get();
+
+		  items.sort(function () {
+			return 0.5 - Math.random();
+		  });
+		  productGrid.empty().append(items);
+		}
+
+		// Call shuffle function after products are loaded
 		$("#load-more").on("click", function () {
 		  page += 1;
 		  loadMoreProducts(page);
+		  shuffleProductCards(); // Shuffle after loading more products
 		});
-	
+
+		// Shuffle initially
+		shuffleProductCards();
+
 		function loadMoreProducts(page) {
 		  var url = "/load_more_products?page=" + page;
 		  $.get(url, { loaded_product_ids: loadedProductIds }, function (response) {
@@ -393,6 +396,8 @@
 		function truncateString(str, length) {
 		  return str.length > length ? str.substring(0, length) + "..." : str;
 		}
+
+		
 	  });
 	</script>
 	{% endblock %}

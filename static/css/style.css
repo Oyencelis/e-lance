@@ -641,3 +641,13 @@ h1,h2,h3,h4,h5,h6 {
   }
 }
 
+.text-danger-custom {
+    color: #ff4d4d; /* Custom red color for danger */
+}
+
+.text-success-custom {
+    color: #28a745; /* Custom green color for success */
+}
+
+
+

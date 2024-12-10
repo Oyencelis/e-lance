@@ -125,18 +125,16 @@
                     </a>
                     {% endif %}
                     <a class="dropdown-item view-product" 
-                      data-id="{{ data['product_id'] }}" 
-                      data-product-name="{{ data['product_name'] }}" 
-                      onclick="openViewModal(this)">
+                      href="/product/view/{{ data['product_id'] }}">
                       <i class="bx bx-show me-1"></i>View
                     </a>
                     {% if data['status'] == 1 %}
-                    <a class="dropdown-item change-status" data-status-to="2" data-id="{{ data['product_id'] }}" href="javascript:void(0);">
+                    <a class="dropdown-item change-status" data-status-to="2" data-id="{{ data['product_id'] }}" href="javascript:void(0);" onclick="archiveProduct(this)">
                       <i class="bx bx-trash me-1"></i> Archive
                     </a>
                     {% else %}
-                    <a class="dropdown-item change-status" data-status-to="1" data-id="{{ data['product_id'] }}" href="javascript:void(0);">
-                      <i class="bx bx-folder-plus me-1"></i> Retrive
+                    <a class="dropdown-item change-status" data-status-to="1" data-id="{{ data['product_id'] }}" href="javascript:void(0);" onclick="retrieveProduct(this)">
+                      <i class="bx bx-folder-plus me-1"></i> Retrieve
                     </a>
                     {% endif %}
                   </div>
@@ -302,6 +300,32 @@
     });
 
   })
+
+  function archiveProduct(element) {
+    var productId = $(element).data("id");
+    $.post('/archive-product', { prod_id: productId }, function(response) {
+        // Handle the response
+        if (response.status === 'success') {
+            alert(response.message);
+            location.reload(); // Reload the page to see changes
+        } else {
+            alert('Error: ' + response.message);
+        }
+    });
+  }
+
+  function retrieveProduct(element) {
+    var productId = $(element).data("id");
+    $.post('/retrieve-product', { prod_id: productId }, function(response) {
+        // Handle the response
+        if (response.status === 'success') {
+            alert(response.message);
+            location.reload(); // Reload the page to see changes
+        } else {
+            alert('Error: ' + response.message);
+        }
+    });
+  }
 </script>
 {% endblock %}
 

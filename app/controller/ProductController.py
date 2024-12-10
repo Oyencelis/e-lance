@@ -1,10 +1,14 @@
-from flask import render_template, session, g, request
+from flask import render_template, session, g, request, redirect, url_for
 from helpers.QueryHelpers import executeGet, executePost, changeStatus
 from helpers.HelperFunction import responseData, allowed_image_file, generate_random_filename
 import os
 from werkzeug.utils import secure_filename
 import uuid
 from controller.HomeController import getCategoriesInHome
+from controller.UserController import getSellers
+import locale
+
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'images', 'uploads')
 
@@ -111,17 +115,22 @@ def changeProductStatus():
         return responseData("success", "Product has been deleted.", product_id, 200)
     
 def viewProduct(product_id):
+    print(f"Viewing product with ID: {product_id}")  # Debugging line
     categories = getCategoriesInHome("WHERE status = 1")
+    cart_items = session.get('cart', {})
     try:
-        # Sanitize the product_id input
         product_id = int(product_id)
         
-        # Get product details using direct SQL query for debugging
+        # Updated query to include product images
         query = "SELECT p.product_id, p.product_name, p.description, p.price, p.qty, COALESCE (pa.attachment, 'no-image.jpg') as attachment FROM products p LEFT JOIN product_attachments pa ON p.product_id = pa.product_id WHERE p.product_id = %s AND p.status = 1"
         
         product = executeGet(query, (product_id,))
         
-        # Check if the product list is empty
+        # Fetch product images
+        images_query = "SELECT pa.attachment FROM product_attachments pa WHERE pa.product_id = %s"
+        product_images = executeGet(images_query, (product_id,))
+        product_images = [img['attachment'] for img in product_images]  # Extract image names
+        
         if not product:
             print(f"No product found with ID: {product_id}")
             return render_template('views/404.html'), 404
@@ -142,8 +151,9 @@ def viewProduct(product_id):
                              product_image_url=product_image_url,
                              product_qty=product['qty'],
                              product_id=product_id,
-                             cat_data=categories)
-                             
+                             cat_data=categories,
+                             product_images=product_images,
+                             cart_items=cart_items)  # Pass images to template
     except Exception as e:
         print(f"Error in viewProduct: {str(e)}")
         return render_template('views/404.html'), 404
@@ -223,61 +233,134 @@ def updateCategories():
 def updateProducts():
     product_name = request.form.get('prodname')
     category_id = request.form.get('category_id')
-    description =  request.form.get('description')
-    price =  request.form.get('price')
-    quantity =  request.form.get('quantity')
+    description = request.form.get('description')
+    price = request.form.get('price')
+    quantity = request.form.get('quantity')
     product_id = request.form.get('product_id')
 
-    
-    if product_name is None or product_name == "":
-        return responseData("error", "Product name is required", "", 200)
-    
-    if category_id is None or category_id == "":
-        return responseData("error", "Category is required", "", 200)
-    
-    if description is None or description == "":
-        return responseData("error", "Description is required", "", 200)
-    
-    if price is None or price == "":
-        return responseData("error", "Price is required", "", 200)
-    
-    if quantity is None or quantity == "":
-        return responseData("error", "Quantity is required", "", 200)
-    
+    # Consolidate validation checks into a single loop
+    required_fields = {
+        "Product name": product_name,
+        "Category": category_id,
+        "Description": description,
+        "Price": price,
+        "Quantity": quantity
+    }
+
+    for field_name, value in required_fields.items():
+        if not value:
+            return responseData("error", f"{field_name} is required", "", 200)
+
+    # Check for existing product name in the same category
     products = getProductsByField("product_name", f"WHERE product_name = '{product_name}' AND category_id = {category_id}")
     if products:
         return responseData("error", "Product name already exists in this category", "", 200)
-    
+
     # Perform the update query
-    query = "UPDATE products SET product_name = %s, category_id = %s, description = %s, price = %s, quantity = %s WHERE product_id = %s"
+    query = "UPDATE products SET product_name = %s, category_id = %s, description = %s, price = %s, qty = %s WHERE product_id = %s"
     executePost(query, (product_name, category_id, description, price, quantity, product_id))
-    
+
     return responseData("success", "Product has been updated.", "", 200)
 
-def buyProduct(product_id):
-    if request.method == 'POST':
-        # Process the form data
-        full_name = request.form.get('full_name')
-        mobile_number = request.form.get('mobile_number')
-        floor_unit = request.form.get('floor_unit')
-        province = request.form.get('province')
-        district = request.form.get('district')
-        ward = request.form.get('ward')
-        other_notes = request.form.get('other_notes')
-        payment_method = request.form.get('payment_method')
+def addToCart():
+    product_id = request.form.get('product_id')
+    quantity = request.form.get('quantity', type=int)  # Get the quantity from the form
+    user_id = g.authenticated.get('user_id')  # Get the logged-in user's ID
 
-        # Validate the input data
-        if not full_name or not mobile_number or not payment_method:
-            return responseData("error", "Please fill in all required fields.", "", 400)
+    if user_id and quantity is not None:  # Check if user is logged in and quantity is set
+        # Check if the product already exists in the cart
+        check_query = "SELECT quantity FROM order_items WHERE product_id = %s AND user_id = %s"
+        existing_item = executeGet(check_query, (product_id, user_id))
 
-        # Payment processing logic
-        try:
-            # Call payment gateway API here
-            # e.g., charge the user
-            pass
-        except Exception as e:
-            return responseData("error", "Payment processing failed: " + str(e), "", 400)
+        if existing_item:  # If the product exists, update the quantity
+            new_quantity = existing_item[0]['quantity'] + quantity
+            update_query = "UPDATE order_items SET quantity = %s WHERE product_id = %s AND user_id = %s"
+            executePost(update_query, (new_quantity, product_id, user_id))
+        else:  # If the product does not exist, insert it
+            insert_query = "INSERT INTO order_items (product_id, user_id, quantity) VALUES (%s, %s, %s)"
+            executePost(insert_query, (product_id, user_id, quantity))
 
-        return responseData("success", "Order placed successfully!", "", 200)
+    return responseData("success", "Product added to cart", "", 200)
 
-    return render_template('views/Products/buy-products.html', product_id=product_id,)
+def removeFromCart():
+    product_id = request.form.get('product_id')
+    user_id = g.authenticated.get('user_id')
+    query = "DELETE FROM order_items WHERE product_id = %s AND user_id = %s"
+    executePost(query, (product_id, user_id))
+    return redirect(url_for('cart_page'))
+def updateCart():
+    data = request.get_json()
+    product_id = data.get('product_id')
+    quantity = data.get('quantity')
+    user_id = g.authenticated.get('user_id')
+
+    if user_id and product_id and quantity is not None:
+        # Update the quantity in the order_items table
+        update_query = "UPDATE order_items SET quantity = %s WHERE product_id = %s AND user_id = %s"
+        executePost(update_query, (quantity, product_id, user_id))
+
+        # Get the updated price for the cart item
+        total_price_query = "SELECT SUM(o.quantity * p.price) AS total_price FROM order_items o JOIN products p ON o.product_id = p.product_id WHERE o.user_id = %s"
+        result = executeGet(total_price_query, (user_id,))
+        total_price = result[0]['total_price'] if result else 0
+
+        # Send the updated total price
+        return responseData("success", "Quantity updated", {"total_price": total_price}, 200)
+
+    return responseData("error", "Invalid request", "", 400)
+
+def calculateTotalSum(user_id):
+    query = "SELECT SUM(quantity * price) FROM order_items WHERE user_id = %s"
+    result = executeGet(query, (user_id,))
+    return result[0]['SUM(quantity * price)'] if result else 0
+
+def checkout():
+    user_id = g.authenticated.get('user_id')  # Get the logged-in user's ID
+    if not user_id:
+        return redirect(url_for('login_page'))  # Redirect to login if not authenticated
+
+    # Check if the user has items in the cart
+    cart_query = "SELECT COUNT(*) as item_count FROM order_items WHERE user_id = %s"
+    cart_count = executeGet(cart_query, (user_id,))
+
+    if cart_count and cart_count[0]['item_count'] == 0:
+        return redirect(url_for('details_page'))  # Redirect to details.html if no items in cart
+
+    return render_template('views/Products/checkout.html')
+
+def details():
+    categories = getCategoriesInHome("WHERE status = 1")
+    return render_template('views/Products/details.html', cat_data=categories)
+
+def detailsSubmit():
+    user_id = g.authenticated.get('user_id')  # Get the logged-in user's ID
+
+    # Retrieve form data
+    floor_unit_number = request.form.get('floor_unit_number')
+    region = request.form.get('region')
+    province = request.form.get('province')
+    city = request.form.get('city')
+    barangay = request.form.get('barangay')
+    street = request.form.get('street_text')  # Ensure this matches the name attribute
+    other_notes = request.form.get('other_notes')  # Ensure this matches the name attribute
+
+    # Debugging: Print the received data
+    print("Received data:")
+    print(f"User ID: {user_id}")
+    print(f"Floor Unit Number: {floor_unit_number}")
+    print(f"Region: {region}")
+    print(f"Province: {province}")
+    print(f"City: {city}")
+    print(f"Barangay: {barangay}")
+    print(f"Street: {street}")
+    print(f"Other Notes: {other_notes}")
+
+    # Check for required fields
+    if not all([floor_unit_number, region, province, city, barangay]):
+        return responseData("error", "All fields are required.", "", 200)
+
+    # Insert into the database (example)
+    insert_query = "INSERT INTO addresses (user_id, floor_unit_number, region, province, city_municipality, barangay, street, other_notes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    executePost(insert_query, (user_id, floor_unit_number, region, province, city, barangay, street, other_notes))
+
+    return responseData("success", "Address submitted successfully!", "", 200)

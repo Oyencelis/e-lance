@@ -16,15 +16,19 @@
 			  <p>Welcome to E-Lance, your premier platform for selling smartphones. Log in to explore our extensive collection of the latest and most innovative smartphones, manage your listings, and connect with tech enthusiasts. Your gateway to the smartphone marketplace awaits!</p>
 			</div>
 			<div class="col-md-6 p-5">
-			  <form  id="loginForm">
+			  <form id="loginForm">
                   <div class="mb-3">
                       <label for="" class="form-label">Email</label>
                       <input type="email" class="form-control form-control-lg" name="email" id="email" placeholder="Enter your email">
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3 position-relative">
                       <label for="name" class="form-label">Password</label>
-                      <input type="password"
-                        class="form-control form-control-lg" name="password" id="password" placeholder="Enter password">
+                      <div class="input-group">
+                        <input type="password" class="form-control form-control-lg" name="password" id="password" placeholder="Enter password">
+                        <span id="togglePassword" class="input-group-text" style="cursor: pointer;">
+                          <i class='bx bx-show' id="eyeIcon"></i>
+                        </span>
+                      </div>
                     </div>
 				<div class="d-grid gap-2">
 				  <button type="submit" class="btn btn-dark btn-lg">Login</button>
@@ -69,7 +73,19 @@ $(document).ready(function() {
 			}
 		});
 	});
-	
+
+	// Show/Hide Password with Eye Icon
+	$('#togglePassword').click(function() {
+		const passwordField = $('#password');
+		const eyeIcon = $('#eyeIcon');
+		if (passwordField.attr('type') === 'password') {
+			passwordField.attr('type', 'text');
+			eyeIcon.removeClass('bx-show').addClass('bx-hide');
+		} else {
+			passwordField.attr('type', 'password');
+			eyeIcon.removeClass('bx-hide').addClass('bx-show');
+		}
+	});
 })
 
 </script>

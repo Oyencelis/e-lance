@@ -33,12 +33,13 @@
                     </div>
 					<div class="mb-3">
                         <label for="" class="form-label">Phone Number</label>
-                        <input type="text" class="form-control form-control-lg" name="phone" id="phone" placeholder="Enter your number">
+                        <input type="text" class="form-control form-control-lg" name="phone" id="phone" placeholder="Enter your number" maxlength="11">
                     </div>
                     <div class="mb-3">
                       <label for="name" class="form-label">Password</label>
                       <input type="password"
-                        class="form-control form-control-lg" name="password" id="password" placeholder="Enter password">
+                        class="form-control form-control-lg" name="password" id="password" placeholder="Enter password" oninput="checkPasswordStrength()">
+                      <div id="passwordStrength" class="mt-2"></div>
                     </div>
                     <div class="mb-3">
                         <label for="name" class="form-label">Confirm Password</label>
@@ -73,7 +74,12 @@ $(document).ready(function() {
 		var password = $('#password').val();
         var confirmPassword = $('#confirmPassword').val();
 
-        // Client-side validation for password matching
+        // Client-side validation for password length and matching
+        if (password.length < 8) {
+            swal('Oops!', 'Password must be at least 8 characters long.', 'error');
+            return;
+        }
+
         if (password !== confirmPassword) {
             swal('Oops!', 'Passwords do not match. Please try again.', 'error');
             return;
@@ -96,6 +102,54 @@ $(document).ready(function() {
 		});
 	});
 	
+    // Function to check password strength
+    window.checkPasswordStrength = function() {
+        var password = $('#password').val();
+        var strengthText = '';
+        var strengthClass = '';
+        var strengthScore = 0;
+        var phone = $('#phone').val();
+        if (!/^(09\d{9})$/.test(phone)) {
+            $.SystemScript.swalAlertMessage('Oops!', 'Please enter a valid Philippine phone number (11 digits starting with 09).', 'error');
+            return;
+        }
+
+        // Criteria checks
+        if (password.length >= 8) strengthScore++; // Length
+        if (/[A-Z]/.test(password)) strengthScore++; // Uppercase letter
+        if (/[a-z]/.test(password)) strengthScore++; // Lowercase letter
+        if (/[0-9]/.test(password)) strengthScore++; // Number
+        if (/[\W_]/.test(password)) strengthScore++; // Special character
+
+        // Determine strength based on score
+        switch (strengthScore) {
+            case 0:
+            case 1:
+                strengthText = 'Very Weak';
+                strengthClass = 'text-danger-custom';
+                break;
+            case 2:
+                strengthText = 'Weak';
+                strengthClass = 'text-grey';
+                break;
+            case 3:
+                strengthText = 'Moderate';
+                strengthClass = 'text-info';
+                break;
+            case 4:
+                strengthText = 'Strong';
+                strengthClass = 'text-success-custom';
+                break;
+            case 5:
+                strengthText = 'Very Strong';
+                strengthClass = 'text-success-custom';
+                break;
+        }
+
+        // Update the text and color
+        $('#passwordStrength').text(strengthText).removeClass('text-danger text-warning text-info text-success').addClass(strengthClass);
+    };
+
 })
 
 </script>
